@@ -1,0 +1,105 @@
+<div id="donation-goal-widget">
+  <div class="goal-title">Spendenziel: Neuer PC</div>
+  <div class="goal-amount"></div>
+  <div class="goal-bar">
+    <div class="goal-fill"></div>
+  </div>
+  <div class="goal-percentage"></div>
+  <div class="goal-footer"></div>
+</div>
+
+<style>
+/* Cooles Design für Donogoal */
+#donation-goal-widget {
+  font-family: 'Arial', sans-serif;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff5f6d, #ffc371);
+  border-radius: 20px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#donation-goal-widget .goal-title {
+  font-size: 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+#donation-goal-widget .goal-amount {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #ffeaa7;
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
+}
+
+#donation-goal-widget .goal-bar {
+  width: 100%;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+#donation-goal-widget .goal-bar .goal-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  border-radius: 10px 0 0 10px;
+  transition: width 0.5s ease-in-out;
+}
+
+#donation-goal-widget .goal-percentage {
+  font-size: 14px;
+  color: #fff;
+  position: absolute;
+  top: -25px;
+  right: 10px;
+  text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
+}
+
+#donation-goal-widget .goal-footer {
+  font-size: 14px;
+  margin-top: 10px;
+  color: #fff;
+  opacity: 0.8;
+}
+</style>
+
+<script>
+// Spendenziel-Logik
+let currentAmount = 0; // Aktuell gespendeter Betrag
+let goalAmount = 100; // Zielbetrag
+
+// Funktion zum Aktualisieren der Spendenanzeige
+const updateDonogoal = () => {
+  const percentage = (currentAmount / goalAmount) * 100;
+  document.querySelector('.goal-amount').textContent = `€${currentAmount.toFixed(2)} von €${goalAmount.toFixed(2)} gesammelt`;
+  document.querySelector('.goal-fill').style.width = `${percentage}%`;
+  document.querySelector('.goal-percentage').textContent = `${Math.floor(percentage)}%`;
+  document.querySelector('.goal-footer').textContent = `Noch €${(goalAmount - currentAmount).toFixed(2)} bis zum Ziel!`;
+};
+
+// Simulation: Spende hinzufügen
+const addDonation = (amount) => {
+  currentAmount += amount;
+  if (currentAmount > goalAmount) currentAmount = goalAmount; // Maximal bis zum Zielbetrag
+  updateDonogoal();
+};
+
+// Initiales Setup
+updateDonogoal();
+
+// Beispiel: Automatische Spenden hinzufügen (alle 3 Sekunden)
+setInterval(() => {
+  addDonation(Math.random() * 10); // Zufällige Spende zwischen €0 und €10
+}, 3000);
+</script>
