@@ -1,105 +1,128 @@
-<div id="donation-goal-widget">
-  <div class="goal-title">Spendenziel: Neuer PC</div>
-  <div class="goal-amount"></div>
-  <div class="goal-bar">
-    <div class="goal-fill"></div>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donogoal</title>
+  <style>
+    /* Styling für das Donogoal-Widget */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: transparent;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .goal-container {
+      width: 80%;
+      max-width: 600px;
+      background-color: #222;
+      border: 2px solid #444;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .goal-header {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .goal-bar {
+      position: relative;
+      background-color: #555;
+      border-radius: 8px;
+      height: 30px;
+      overflow: hidden;
+    }
+
+    .goal-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      width: 0;
+      transition: width 0.5s ease;
+    }
+
+    .goal-percentage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+    }
+
+    .goal-amount {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .goal-footer {
+      text-align: center;
+      font-size: 1rem;
+      color: #aaa;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="goal-container">
+    <div class="goal-header">GO XLR</div>
+    <div class="goal-bar">
+      <div class="goal-fill"></div>
+      <div class="goal-percentage">0%</div>
+    </div>
+    <div class="goal-amount">€0 von €100 gesammelt</div>
+    <div class="goal-footer">Noch €100 bis zum Ziel!</div>
   </div>
-  <div class="goal-percentage"></div>
-  <div class="goal-footer"></div>
-</div>
 
-<style>
-/* Cooles Design für Donogoal */
-#donation-goal-widget {
-  font-family: 'Arial', sans-serif;
-  color: #ffffff;
-  background: linear-gradient(135deg, #ff5f6d, #ffc371);
-  border-radius: 20px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-  max-width: 400px;
-  margin: 0 auto;
-}
+  <script>
+    // Go XLR-Logik
+    let currentAmount = 0; // Aktuell gesammelter Betrag
+    let goalAmount = 100; // Zielbetrag
+    const accessToken = "DEIN_API_KEY"; // Füge hier deinen Streamlabs API-Token ein
 
-#donation-goal-widget .goal-title {
-  font-size: 20px;
-  font-weight: bold;
-  text-transform: uppercase;
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-}
+    // Funktion zum Aktualisieren der Anzeige
+    const updateDonogoal = () => {
+      const percentage = (currentAmount / goalAmount) * 100;
+      document.querySelector('.goal-amount').textContent = `€${currentAmount.toFixed(2)} von €${goalAmount.toFixed(2)} gesammelt`;
+      document.querySelector('.goal-fill').style.width = `${percentage}%`;
+      document.querySelector('.goal-percentage').textContent = `${Math.floor(percentage)}%`;
+      document.querySelector('.goal-footer').textContent = `Noch €${(goalAmount - currentAmount).toFixed(2)} bis zum Ziel!`;
+    };
 
-#donation-goal-widget .goal-amount {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #ffeaa7;
-  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.7);
-}
+    // Spenden von der API abrufen
+    const fetchDonations = async () => {
+      try {
+        const response = await fetch(
+          `https://streamlabs.com/api/v1.0/donations?access_token=${accessToken}`
+        );
+        const data = await response.json();
 
-#donation-goal-widget .goal-bar {
-  width: 100%;
-  height: 20px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
-}
+        // Berechne die Gesamtsumme der Spenden
+        currentAmount = data.donations.reduce(
+          (sum, donation) => sum + parseFloat(donation.amount),
+          0
+        );
+        updateDonogoal(); // Fortschritt aktualisieren
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Spenden:", error);
+      }
+    };
 
-#donation-goal-widget .goal-bar .goal-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #6a11cb, #2575fc);
-  border-radius: 10px 0 0 10px;
-  transition: width 0.5s ease-in-out;
-}
+    // API regelmäßig abrufen (alle 10 Sekunden)
+    setInterval(fetchDonations, 10000);
 
-#donation-goal-widget .goal-percentage {
-  font-size: 14px;
-  color: #fff;
-  position: absolute;
-  top: -25px;
-  right: 10px;
-  text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.5);
-}
-
-#donation-goal-widget .goal-footer {
-  font-size: 14px;
-  margin-top: 10px;
-  color: #fff;
-  opacity: 0.8;
-}
-</style>
-
-<script>
-// Spendenziel-Logik
-let currentAmount = 0; // Aktuell gespendeter Betrag
-let goalAmount = 100; // Zielbetrag
-
-// Funktion zum Aktualisieren der Spendenanzeige
-const updateDonogoal = () => {
-  const percentage = (currentAmount / goalAmount) * 100;
-  document.querySelector('.goal-amount').textContent = `€${currentAmount.toFixed(2)} von €${goalAmount.toFixed(2)} gesammelt`;
-  document.querySelector('.goal-fill').style.width = `${percentage}%`;
-  document.querySelector('.goal-percentage').textContent = `${Math.floor(percentage)}%`;
-  document.querySelector('.goal-footer').textContent = `Noch €${(goalAmount - currentAmount).toFixed(2)} bis zum Ziel!`;
-};
-
-// Simulation: Spende hinzufügen
-const addDonation = (amount) => {
-  currentAmount += amount;
-  if (currentAmount > goalAmount) currentAmount = goalAmount; // Maximal bis zum Zielbetrag
-  updateDonogoal();
-};
-
-// Initiales Setup
-updateDonogoal();
-
-// Beispiel: Automatische Spenden hinzufügen (alle 3 Sekunden)
-setInterval(() => {
-  addDonation(Math.random() * 10); // Zufällige Spende zwischen €0 und €10
-}, 3000);
-</script>
+    // Initiales Setup
+    updateDonogoal();
+    fetchDonations(); // Erste Daten direkt laden
+  </script>
+</body>
+</html>
